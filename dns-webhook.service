@@ -1,0 +1,15 @@
+[Unit]
+Description=Netbox - DNS webhook updates
+After=network-online.target
+Wants=network-online.target
+Conflicts=shutdown.target
+
+[Service]
+User=bind
+ExecStart=/usr/bin/python3 /usr/local/sbin/nb_dns_run.py
+WorkingDirectory=/var/tmp
+Restart=on-failure
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target
