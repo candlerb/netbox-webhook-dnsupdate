@@ -46,14 +46,32 @@ would have done, uncomment this line:
 #ddns = DummyUpdater()
 ```
 
-## Caveats and limitations
+## Logic
 
-The Netbox webhook update message does not [provide the old
+The update message from Netbox does not [provide the old
 data](https://github.com/netbox-community/netbox/issues/3451).  This makes
 this updater much more complicated that it otherwise might be.
 
 The webhook performs DNS queries to find out what records already exist, to
-work out whether records needed to be added or removed.
+work out whether records needed to be added and/or removed.
+
+When an IP address record with dnsname is saved:
+
+* The name is queried for existing A or AAAA records (depending on the address
+  family of the ipaddress object)
+* Any existing A/AAAA records for this name which point to *another* IP address
+  are removed
+* In addition, any PTR records from that other IP address which point back
+  to the same name are removed
+
+Also:
+
+* The address is queried for existing PTR records
+* Any existing PTR records which point to *another* name are removed
+* In addition, any A/AAAA records from that other name which point to
+  the same IP address are removed
+
+## Caveats and limitations
 
 * Any save of an ipaddress object will cause the DNS records to be queried
   and reconciled, even if the `address` and `dns_name` have not changed
