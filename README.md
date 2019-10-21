@@ -58,7 +58,9 @@ work out whether records needed to be added or removed.
 * Any save of an ipaddress object will cause the DNS records to be queried
   and reconciled, even if the `address` and `dns_name` have not changed
 * **If you save any ipaddress object where the dns_name is empty, this will
-  cause all existing PTR records for that IP address to be removed**
+  cause all existing PTR records for that IP address to be removed** (plus,
+  if there was a forward DNS name which is the same as the PTR record, that
+  forward DNS entry will be removed as well)
 * If you change *both* the `address` and `dns_name` of an ipaddress object
   at the same time, the old name and address will remain in the DNS
 * You have to configure each zone that you want to update.  It does not work
