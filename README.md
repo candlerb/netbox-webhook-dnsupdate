@@ -65,7 +65,9 @@ work out whether records needed to be added or removed.
   out for itself where the zone cuts are.
 * Netbox does not have a [unique constraint](https://github.com/netbox-community/netbox/issues/3490)
   on `(dns_name, family)`.  Bad things could happen if two different addresses
-  have the same DNS name, except when one is IPv4 and one is IPv6.
+  have the same DNS name, except when one is IPv4 and one is IPv6.  Bad
+  things can happen if the same IP address exists multiple times, e.g. in
+  different VRFs.
 * No SSL support
 * ~~See also [this bug](https://github.com/netbox-community/netbox/issues/3489)
   which causes an exception when you delete an ipaddress.~~ (Fixed in
