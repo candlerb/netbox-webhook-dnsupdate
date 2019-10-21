@@ -67,8 +67,9 @@ work out whether records needed to be added or removed.
   on `(dns_name, family)`.  Bad things could happen if two different addresses
   have the same DNS name, except when one is IPv4 and one is IPv6.
 * No SSL support
-* See also [this bug](https://github.com/netbox-community/netbox/issues/3489)
-  which causes an exception when you delete an ipaddress.
+* ~~See also [this bug](https://github.com/netbox-community/netbox/issues/3489)
+  which causes an exception when you delete an ipaddress.~~ (Fixed in
+  Netbox v2.6.4)
 
 ## Licence
 
