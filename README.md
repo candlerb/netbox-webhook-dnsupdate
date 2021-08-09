@@ -19,7 +19,7 @@ same IP address, still need to be added outside of Netbox.
 feature in webhooks.  An older version is in the `pre-v2.11` branch**
 
 Requires [dnspython](http://www.dnspython.org/examples.html).  Tested with
-version 0.16, which can be installed using pip:
+version 2.1.0, which can be installed using pip:
 
 ```
 pip3 install dnspython
