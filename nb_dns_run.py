@@ -3,7 +3,7 @@
 # This is the configuration and startup for the webhook server.
 # Edit to suit.
 
-import dns.tsigkeyring
+import dns.tsig, dns.tsigkeyring
 from nb_dns_updater import DummyUpdater, DDNSUpdater, simple_server
 
 SERVER = '127.0.0.1'
@@ -12,9 +12,10 @@ SECRET = 'XXXXXXXXXXXXXXXXXXXXXX=='
 KEYRING = dns.tsigkeyring.from_text({
     KEY_ID: SECRET,
 })
+KEYALGORITHM = dns.tsig.HMAC_MD5
 WEBHOOK_SECRET = 'VERY RANDOM STRING'
 
-ddns = DDNSUpdater(server=SERVER, keyring=KEYRING)
+ddns = DDNSUpdater(server=SERVER, keyring=KEYRING, keyalgorithm=KEYALGORITHM)
 #ddns = DummyUpdater()
 
 # List all the zones you wish to update, pointing at the relevant

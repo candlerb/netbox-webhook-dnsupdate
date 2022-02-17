@@ -45,7 +45,7 @@ class DDNSUpdater:
             for u in updates:
                 self.debug(u)
 
-        updater = dns.update.Update(zone, keyalgorithm=dns.tsig.HMAC_MD5, **self.kwargs)
+        updater = dns.update.Update(zone, **self.kwargs)
         for (action, args) in updates:
             getattr(updater, action)(*args)
         response = dns.query.tcp(updater, self.server)
