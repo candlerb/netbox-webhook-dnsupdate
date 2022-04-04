@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 This is a dynamic DNS webhook for Netbox.  It updates A/AAAA and PTR records
 based on the dns_name attribute of ipam.ipaddress records.

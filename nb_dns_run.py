@@ -4,28 +4,31 @@
 # Edit to suit.
 
 import dns.tsig, dns.tsigkeyring
+from dotenv import load_dotenv, find_dotenv
+from os.path import join, dirname
+import os, json
 from nb_dns_updater import DummyUpdater, DDNSUpdater, simple_server
 
-SERVER = '127.0.0.1'
-KEY_ID = 'my-key-name'
-SECRET = 'XXXXXXXXXXXXXXXXXXXXXX=='
-KEYRING = dns.tsigkeyring.from_text({
-    KEY_ID: SECRET,
-})
-KEYALGORITHM = dns.tsig.HMAC_MD5
-WEBHOOK_SECRET = 'VERY RANDOM STRING'
+load_dotenv(find_dotenv())
 
-ddns = DDNSUpdater(server=SERVER, keyring=KEYRING, keyalgorithm=KEYALGORITHM)
+key_id = os.getenv("KEY_ID")
+secret = os.getenv("SECRET")
+server = os.getenv("SERVER")
+keyalgorithm = os.getenv("KEYALGORITHM")
+webhook_secret = os.getenv("WEBHOOK_SECRET")
+zones = json.loads(os.getenv("ZONES"))
+
+KEYRING = dns.tsigkeyring.from_text({
+    key_id: secret,
+})
+
+ddns = DDNSUpdater(server=server, keyring=KEYRING, keyalgorithm=keyalgorithm)
 #ddns = DummyUpdater()
 
 # List all the zones you wish to update, pointing at the relevant
 # updater object.  You can have different zones on different
 # servers and/or with different keys
-ZONES = {
-    "example.com": ddns,
-    "168.192.in-addr.arpa": ddns,
-    "8.b.d.0.1.0.0.2.ip6.arpa": ddns,
-}
+ZONES = { z: ddns for z in zones }
 
 if __name__ == "__main__":
-    simple_server(ZONES, api_key=WEBHOOK_SECRET)
+    simple_server(ZONES, api_key=webhook_secret)
