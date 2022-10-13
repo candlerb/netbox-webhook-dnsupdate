@@ -108,7 +108,8 @@ class UpdateMapper:
         for n, updates in ctx.items():
             err = self.zones[n](n, updates)
             if err:
-                print(err, file=sys.stderr)
+                if self.debug:
+                    self.debug(err)
                 errors.append(err)
         return errors
 
