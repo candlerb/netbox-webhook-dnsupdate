@@ -8,11 +8,11 @@ from nb_dns_updater import DummyUpdater, DDNSUpdater, simple_server
 
 SERVER = '127.0.0.1'
 KEY_ID = 'my-key-name'
-SECRET = 'XXXXXXXXXXXXXXXXXXXXXX=='
+SECRET = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX='
 KEYRING = dns.tsigkeyring.from_text({
     KEY_ID: SECRET,
 })
-KEYALGORITHM = dns.tsig.HMAC_MD5
+KEYALGORITHM = dns.tsig.HMAC_SHA256
 WEBHOOK_SECRET = 'VERY RANDOM STRING'
 
 ddns = DDNSUpdater(server=SERVER, keyring=KEYRING, keyalgorithm=KEYALGORITHM)
