@@ -30,6 +30,10 @@ class DummyUpdater:
                 self.debug(u)
 
 class DDNSUpdater:
+    """
+    A callable which performs a batch of DDNS updates,
+    supplied as a list of tuples of (action_name, dns_name, args...)
+    """
     def __init__(self, server, debug=lambda x: print(x, file=sys.stderr), **kwargs):
         # we can accept either an IP address or a hostname
         self.server = socket.getaddrinfo(server, None)[0][4][0]
@@ -51,8 +55,7 @@ class DDNSUpdater:
         response = dns.query.tcp(updater, self.server)
         rcode = response.rcode()
         if rcode != dns.rcode.NOERROR:
-            print("DNS update for %s failed: %s" % (zone, dns.rcode.to_text(rcode)),
-                  file=sys.stderr)
+            return "DNS update for %s failed: %s" % (zone, dns.rcode.to_text(rcode))
 
 class UpdateMapper:
     """
@@ -101,8 +104,13 @@ class UpdateMapper:
         self._record(ctx, "delete", dnsname, rrtype, data)
 
     def commit(self, ctx):
+        errors = []
         for n, updates in ctx.items():
-            self.zones[n](n, updates)
+            err = self.zones[n](n, updates)
+            if err:
+                print(err, file=sys.stderr)
+                errors.append(err)
+        return errors
 
 class DNSWebHook:
     """
@@ -155,11 +163,13 @@ class DNSWebHook:
             newaddress = post["address"].split("/")[0]
             newname = post["dns_name"]
 
-        self.update_dns(oldaddress, oldname, newaddress, newname)
-
-        status = '200 OK'  # HTTP Status
-        start_response(status, headers)
-        return [b'OK']
+        errors = self.update_dns(oldaddress, oldname, newaddress, newname)
+        if errors:
+            start_response('500 Internal Server Error', headers)
+            return [(str(e)+'\n').encode('UTF-8') for e in errors]
+        else:
+            start_response('200 OK', headers)
+            return [b'OK']
 
     def update_dns(self, oldaddress, oldname, newaddress, newname):
         """
@@ -193,7 +203,7 @@ class DNSWebHook:
             self.mapper.add(ctx, rrname, self.ttl, rrtype, newaddress)
             self.mapper.add(ctx, revname, self.ttl, "PTR", rrname.to_text())
 
-        self.mapper.commit(ctx)
+        return self.mapper.commit(ctx)
 
 def simple_server(zones, host='', port=7001, **kwargs):
     from wsgiref.simple_server import make_server
@@ -210,4 +220,7 @@ if __name__ == "__main__":
     # new address and new name, and it shows the updates it would make
     mapper = UpdateMapper({"." : DummyUpdater()})
     hook = DNSWebHook(mapper)
-    hook.update_dns(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    errors = hook.update_dns(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    if errors:
+        print(errors)
+        sys.exit(1)
