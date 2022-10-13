@@ -107,9 +107,8 @@ class UpdateMapper:
 class DNSWebHook:
     """
     WSGI application to receive webhook requests for ipaddress objects
-    and apply dynamic DNS updates.  Since the webhook doesn't include
-    the previous value of address or name, it makes DNS queries to find
-    stale records to delete.
+    and apply dynamic DNS updates.  It extracts the address and dns_name
+    from the "prechange" and "postchange" snapshots.
     """
     def __init__(self, mapper, api_key=None, ttl=3600):
         self.mapper = mapper
